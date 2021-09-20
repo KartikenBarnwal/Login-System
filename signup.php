@@ -19,6 +19,8 @@ if (isset($_POST["password"])) {
         if ($exists && mysqli_num_rows($exists)>0) {
             $sameUsername = true;
         } else {
+            // Hashing the password for safe storage
+            $password = password_hash($password, PASSWORD_DEFAULT);
             $sql = "INSERT INTO `users` (`uname`,`password`,`dt`) VALUES ('$uname', '$password', current_timestamp())";
 
             $result = mysqli_query($conn, $sql);

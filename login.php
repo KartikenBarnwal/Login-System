@@ -1,21 +1,27 @@
 <?php
 
-$login = true;  
+$login = true;
 require "_dbconnect.php";
 
 if (isset($_POST["password"])) {
     $uname = $_POST["uname"];
     $password = $_POST["password"];
-    $sql = "SELECT * FROM `users` WHERE `uname`='$uname' AND `password`='$password'";
+
+    $sql = "SELECT * FROM `users` WHERE `uname`='$uname'";
 
     $result = mysqli_query($conn, $sql);
     if (mysqli_num_rows($result) > 0) {
-        $user = mysqli_fetch_assoc($result);
+        while ($user = mysqli_fetch_assoc($result)) {
 
-        session_start();
-        $_SESSION["loggedin"] = true;
-        $_SESSION["uname"] = $user["uname"];
-        header("location: welcome.php");
+            if (password_verify($password, $user["password"])) {
+                session_start();
+                $_SESSION["loggedin"] = true;
+                $_SESSION["uname"] = $user["uname"];
+                header("location: welcome.php");
+            }else{
+                $login = false;
+            }
+        }
     } else {
         $login = false;
     }
@@ -73,8 +79,8 @@ if (isset($_POST["password"])) {
 <body>
     <?php require "partials/_nav.php"; ?>
 
-    <?php 
-    if($login==false){
+    <?php
+    if ($login == false) {
         echo
         '<div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong>Failure!</strong> Invalid Credentials.
